@@ -1,2 +1,2 @@
 # RezhDuma_Bot
-реализация бота
+@RezhDuma_bot
