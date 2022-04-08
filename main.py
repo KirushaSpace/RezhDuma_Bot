@@ -5,20 +5,18 @@ from telebot import types
 bot = telebot.TeleBot(config.TOKEN)
 persons = []
 person = [0] * 2
-class user():
-    def __init__(self, login=None, password=None, id=None):
-        self.login = login
-        self.password = password
-        self.id = id
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    global persons
     name = message.from_user.first_name
     markup = types.InlineKeyboardMarkup(row_width=1)
-    item_login = types.InlineKeyboardButton(text='Вход', callback_data='login')
-    item_site = types.InlineKeyboardButton(text='Переход на сайт', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-    markup.add(item_site, item_login)
+    buttons = [types.InlineKeyboardButton(text='Вход', callback_data='login'),
+               types.InlineKeyboardButton(text='Переход на сайт', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')]
+    if message.from_user.id in persons:
+        buttons.append(types.InlineKeyboardButton(text='Личный кабинет', callback_data='lk'))
+    markup.add(buttons)
     bot.send_message(message.chat.id,
                      '\n'.join(map(lambda str: str.strip(), f'''Привет, {name}, я твой помощник!
                          пару слов туда-сюда
@@ -37,6 +35,13 @@ def answer(call):
         markup.add(button)
         msg = bot.send_message(call.message.chat.id, 'хер там, сайта еще нет', reply_markup=markup)
         bot.register_next_step_handler(msg, start)
+    elif call.data == 'lk':
+        markup = types.ReplyKeyboardMarkup(row_width=2, one_time_keyboard=True)
+        buttons = [types.KeyboardButton(text='Почта'),
+                   types.KeyboardButton(text='заявки')]
+        markup.add(buttons)
+        bot.send_message(call.message.chat.id, 'Выберете куда вы хотите перейти', reply_markup=markup)
+
 
 
 def user_login(message):
@@ -53,7 +58,7 @@ def user_password(message):
     global person, persons
     person[1] = password
     if person not in persons:
-        persons.append(user(login=person[0], password=person[1], id=message.from_user.id))
+        persons.append([person[0], person[1], message.from_user.id])
     # todo обработчик пароля
     # todo проверка есть ли пользователь в системе
     bot.send_message(message.chat.id, 'Проверяю...')
@@ -71,11 +76,11 @@ def help(message):
 def per(message):
     global persons
     bot.send_message(message.chat.id,
-                     '\n'.join(map(lambda x: f'{x.login} {x.password} {x.id}', persons)))
+                     '\n'.join(map(lambda x: f'{x[0]} {x[1]} {x[2]}', persons)))
 
 
 @bot.message_handler(commands=['info'])
-def informatoin(message):
+def information(message):
     bot.send_message(message.chat.id, message)
 
 
