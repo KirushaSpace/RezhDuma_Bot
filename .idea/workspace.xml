@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a45e9110-20af-4326-b31f-447b05a55554" name="Changes" comment="fix bugs">
-      <change afterPath="$PROJECT_DIR$/start_message.txt" afterDir="false" />
+    <list default="true" id="a45e9110-20af-4326-b31f-447b05a55554" name="Changes" comment="базовое функционирование бота">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/lk.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lk.py" beforeDir="false" afterPath="$PROJECT_DIR$/lk.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +101,7 @@
       <workItem from="1649437406210" duration="53000" />
       <workItem from="1649524847389" duration="1858000" />
       <workItem from="1650519589959" duration="648000" />
-      <workItem from="1653852017317" duration="13615000" />
+      <workItem from="1653852017317" duration="18258000" />
     </task>
     <task id="LOCAL-00001" summary="add help">
       <created>1649172737619</created>
@@ -132,7 +131,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649526666579</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="базовое функционирование бота">
+      <created>1653866703991</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1653866703991</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -155,21 +161,27 @@
     <MESSAGE value="add logIN" />
     <MESSAGE value="add lk" />
     <MESSAGE value="fix bugs" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix bugs" />
+    <MESSAGE value="базовое функционирование бота" />
+    <option name="LAST_COMMIT_MESSAGE" value="базовое функционирование бота" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/lk.py</url>
-          <line>69</line>
-          <option name="timeStamp" value="1" />
+          <line>17</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/lk.py</url>
+          <line>100</line>
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/bot$lk__1_.coverage" NAME="lk (1) Coverage Results" MODIFIED="1653864363584" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bot$lk__1_.coverage" NAME="lk (1) Coverage Results" MODIFIED="1653871037073" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/bot$main.coverage" NAME="main Coverage Results" MODIFIED="1653852259856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

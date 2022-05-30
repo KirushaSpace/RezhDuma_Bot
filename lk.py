@@ -3,7 +3,7 @@ from config import TOKEN
 from telebot import types
 
 bot = telebot.TeleBot(TOKEN)
-user_forms = [['gg', 'fff']]
+user_forms = []
 user_form = [0] * 2
 
 
@@ -11,13 +11,14 @@ user_form = [0] * 2
 def start(message):
     f = open('start_message.txt', 'r', encoding='utf-8')
     global user_forms
+    print(user_forms,'|',message.from_user.id)
     markup = types.InlineKeyboardMarkup(row_width=1)
     item_log = types.InlineKeyboardButton(text='Вход', callback_data='login')
     markup.add(item_log)
-    if message.from_user.id in user_forms:
-        bot.edit_message_text(chat_id=message.chat.id, message_id=message.message_id, text=f.read())
+    if message.from_user.is_bot:
         item_lk = types.InlineKeyboardButton(text='Личный кабинет', callback_data='lk')
-        markup.add(item_lk)
+        item_logout = types.InlineKeyboardButton(text='Выйти из личного кабинета', callback_data='logout')
+        markup.add(item_lk, item_logout)
 
     item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq')
     item_site = types.InlineKeyboardButton(text='Переход на сайт', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')
@@ -38,11 +39,18 @@ def answer(call):
         keyboard.add(item_log, item_reg, item_back)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Авторизация', reply_markup=keyboard)
     elif call.data == 'lk':
-        markup = types.ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True, resize_keyboard=True)
-        item_mail = types.KeyboardButton(text='Почта')
-        item_mes = types.KeyboardButton(text='заявки')
-        markup.add(item_mail, item_mes)
-        bot.send_message(call.message.chat.id, 'Выберете куда вы хотите перейти', reply_markup=markup)
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        item_mail = types.InlineKeyboardButton(text='Почта', callback_data='mail')
+        item_mes = types.InlineKeyboardButton(text='заявки', callback_data='mes')
+        item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq')
+        item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
+        markup.add(item_mail, item_mes, item_faq, item_back)
+        # todo сделать отображение информации в лк
+        bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
+                              text=
+                              '''Личный кабинет
+                              у вас {0} новых уведомлений
+                              нет изменений в проверке заявок''', reply_markup=markup)
     elif call.data == 'faq':
         bot.send_message(call.message.chat.id, 'Пока часто задаваемых вопросов нет')
     elif call.data == 'back':
@@ -51,6 +59,28 @@ def answer(call):
     elif call.data == 'Yes':
         msg = bot.send_message(chat_id=call.message.chat.id, text='Введите логин (почту) к личному кабинету')
         bot.register_next_step_handler(msg, user_login)
+    elif call.data == 'mail':
+        keyboard = types.InlineKeyboardMarkup()
+        item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='lk')
+        keyboard.add(item_back)
+        bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
+                              text='''Ваши сообщения и ответы на них
+                              0 сообщений''', reply_markup=keyboard) # здесь можно будет посмотреть сообщения
+    elif call.data == 'mes':
+        keyboard = types.InlineKeyboardMarkup()
+        item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='lk')
+        keyboard.add(item_back)
+        bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
+                              text='''Ваши заявки и ответы на них
+                              0 сообщений''', reply_markup=keyboard)
+    elif call.data == 'logout':
+        k = types.InlineKeyboardMarkup()
+        b = types.InlineKeyboardButton(text='Подтверждаю', callback_data='back')
+        b1 = types.InlineKeyboardButton(text='Случайно нажал', callback_data='back')
+        k.add(b, b1)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Хотите выйти?', reply_markup=k)
+    elif call.data == 'del':
+        bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
 
 
 def user_login(message):
@@ -74,9 +104,10 @@ def user_password(message):
     bot.send_message(message.chat.id, 'Проверяю...')
     bot.send_message(message.chat.id, 'Успешный вход в систему, добро пожаловать, {Имя} {Фамилия}')
     markup = types.InlineKeyboardMarkup()
-    button = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
-    markup.add(button)
-    bot.send_message(message.chat.id, 'вернитесь в начало', reply_markup=markup)
+    item_back = types.InlineKeyboardButton(text='Вернуться в начало', callback_data='back')
+    item_lk = types.InlineKeyboardButton(text='Переход в личный кабинет', callback_data='lk')
+    markup.add(item_lk, item_back)
+    bot.send_message(message.chat.id, 'переход', reply_markup=markup)
     # else:
     #     keyboard = types.InlineKeyboardMarkup()
     #     item = types.InlineKeyboardButton(text='Вернуться', callback_data='Yes')
