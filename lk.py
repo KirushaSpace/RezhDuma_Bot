@@ -1,6 +1,8 @@
 import telebot
 from config import TOKEN
 from telebot import types
+import requests
+import datetime
 
 bot = telebot.TeleBot(TOKEN)
 user_forms = []
@@ -11,7 +13,6 @@ user_form = [0] * 2
 def start(message):
     f = open('start_message.txt', 'r', encoding='utf-8')
     global user_forms
-    print(user_forms,'|',message.from_user.id)
     markup = types.InlineKeyboardMarkup(row_width=1)
     item_log = types.InlineKeyboardButton(text='Вход', callback_data='login')
     markup.add(item_log)
@@ -45,14 +46,25 @@ def answer(call):
         item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq')
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
         markup.add(item_mail, item_mes, item_faq, item_back)
-        # todo сделать отображение информации в лк
         bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
                               text=
                               '''Личный кабинет
                               у вас {0} новых уведомлений
                               нет изменений в проверке заявок''', reply_markup=markup)
     elif call.data == 'faq':
-        bot.send_message(call.message.chat.id, 'Пока часто задаваемых вопросов нет')
+        response = requests.get('http://51.250.111.89:8080/api/appeals/popular')
+        s_faq = ''
+        print(response.text)
+        for i in response.json():
+            s_faq += f"Вопрос: *{i['text']}*" + '\n'
+            s_faq += f"Тип: {i['type']}" + '\n'
+            appeal_date = datetime.datetime.strptime(i['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
+            s_faq += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n' * 2
+            s_faq += f"_Ответ: {i['response']}_" + '\n'
+            s_faq += f"_От кого: {i['responsibleName']}_" + '\n'
+            response_date = datetime.datetime.strptime(i['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
+            s_faq += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
+        bot.send_message(call.message.chat.id, s_faq, parse_mode='Markdown')
     elif call.data == 'back':
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         start(call.message)
@@ -119,6 +131,7 @@ def user_password(message):
 def help(message):
     cmds = open('help.txt', 'r', encoding="utf-8")
     bot.send_message(message.chat.id, cmds.read())
+    cmds.close()
 
 
 @bot.message_handler(commands=['persons'])
