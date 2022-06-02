@@ -18,7 +18,6 @@ def start(message):
         item_lk = types.InlineKeyboardButton(text='Личный кабинет', callback_data='lk')
         item_logout = types.InlineKeyboardButton(text='Выйти из личного кабинета', callback_data='logout')
         markup.add(item_lk, item_logout)
-
     item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq')
     item_site = types.InlineKeyboardButton(text='Переход на сайт', url='http://rezh.ml/')
     markup.add(item_site, item_faq)
@@ -96,16 +95,10 @@ def answer(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Хотите выйти?', reply_markup=k)
     elif call.data == 'del':
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
-    # elif call.data == 'next_page':
-    # elif call.data == 'back_page':
-
-
 
 
 def user_login(message):
-    global user_form, user_forms
     login = message.text
-    # todo сделать обработчик логина
     msg = bot.send_message(message.chat.id, 'Введите пароль:')
     bot.register_next_step_handler(msg, user_password, login)
 
