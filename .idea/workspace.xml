@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a45e9110-20af-4326-b31f-447b05a55554" name="Changes" comment="все работающие кнопки">
-      <change afterPath="$PROJECT_DIR$/requestss.py" afterDir="false" />
+    <list default="true" id="a45e9110-20af-4326-b31f-447b05a55554" name="Changes" comment="add faq">
+      <change afterPath="$PROJECT_DIR$/appload_faq.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/faq.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/users.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lk.py" beforeDir="false" afterPath="$PROJECT_DIR$/lk.py" afterDir="false" />
     </list>
@@ -43,6 +45,28 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../contest6" />
   </component>
   <component name="RunManager" selected="Python.lk (1)">
+    <configuration name="appload_faq" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="bot" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/appload_faq.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="lk (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="bot" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -112,6 +136,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.lk (1)" />
+        <item itemvalue="Python.appload_faq" />
         <item itemvalue="Python.requestss" />
       </list>
     </recent_temporary>
@@ -139,7 +164,8 @@
       <workItem from="1653989981742" duration="115000" />
       <workItem from="1654103470500" duration="830000" />
       <workItem from="1654104332460" duration="11378000" />
-      <workItem from="1654176434514" duration="1309000" />
+      <workItem from="1654176434514" duration="7619000" />
+      <workItem from="1654188849211" duration="2993000" />
     </task>
     <task id="LOCAL-00001" summary="add help">
       <created>1649172737619</created>
@@ -183,7 +209,14 @@
       <option name="project" value="LOCAL" />
       <updated>1653871419947</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="add faq">
+      <created>1654177763913</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1654177763913</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -208,22 +241,13 @@
     <MESSAGE value="fix bugs" />
     <MESSAGE value="базовое функционирование бота" />
     <MESSAGE value="все работающие кнопки" />
-    <option name="LAST_COMMIT_MESSAGE" value="все работающие кнопки" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/lk.py</url>
-          <line>112</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="add faq" />
+    <option name="LAST_COMMIT_MESSAGE" value="add faq" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/bot$lk__1_.coverage" NAME="lk (1) Coverage Results" MODIFIED="1654177061929" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bot$lk__1_.coverage" NAME="lk (1) Coverage Results" MODIFIED="1654191799846" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/bot$requestss.coverage" NAME="requestss Coverage Results" MODIFIED="1654105489435" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/bot$main.coverage" NAME="main Coverage Results" MODIFIED="1653852259856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bot$appload_faq.coverage" NAME="appload_faq Coverage Results" MODIFIED="1654180052739" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
