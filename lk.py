@@ -79,19 +79,28 @@ def answer(call):
         msg = bot.send_message(chat_id=call.message.chat.id, text='Введите логин (почту) к личному кабинету')
         bot.register_next_step_handler(msg, user_login)
     elif call.data == 'mail':
+        f = open('users.json', 'r', encoding='utf-8')
+        user = json.loads(f.read())
         keyboard = types.InlineKeyboardMarkup()
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='lk')
         keyboard.add(item_back)
+        mail = requests.get('http://51.250.111.89:8080/api/appeals/user?answered=&find&type&district&topic&page&count',
+                            headers={'Authorization': f'Rezh {user["tg_id"][str(call.message.chat.id)]["access_token"]}'})
+        text = ''
+        for question in mail.json():
+            text += f"Вопрос: *{question['text']}*" + '\n'
+            text += f"Тип: {question['type']}" + '\n'
+            appeal_date = datetime.datetime.strptime(question['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
+            text += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n' * 2
+            if question['response']:
+                text += f"_Ответ: {question['response']}_" + '\n'
+                text += f"_От кого: {question['responsibleName']}_" + '\n'
+                response_date = datetime.datetime.strptime(question['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
+                text += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
+            else:
+                text += f"_Ответа на ваше сообщение еще нет(_" + '\n' * 3
         bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
-                              text='''Ваши сообщения и ответы на них
-                              0 сообщений''', reply_markup=keyboard) # здесь можно будет посмотреть сообщения
-    elif call.data == 'mes':
-        keyboard = types.InlineKeyboardMarkup()
-        item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='lk')
-        keyboard.add(item_back)
-        bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
-                              text='''Ваши заявки и ответы на них
-                              0 сообщений''', reply_markup=keyboard)
+                              text=text, reply_markup=keyboard, parse_mode='Markdown') # здесь можно будет посмотреть сообщения
     elif call.data == 'logout':
         k = types.InlineKeyboardMarkup(row_width=2)
         b = types.InlineKeyboardButton(text='Подтверждаю', callback_data='logout_del')
