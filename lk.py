@@ -14,9 +14,6 @@ def start(message):
     g = open('users.json', 'r', encoding='utf-8')
     markup = types.InlineKeyboardMarkup(row_width=1)
     users = json.loads(g.read())
-    print(message)
-    print(message.from_user.id)
-    print(users['tg_id'].keys())
     if str(message.chat.id) not in users['tg_id'].keys():
         item_log = types.InlineKeyboardButton(text='Вход', callback_data='login')
         markup.add(item_log)
@@ -42,7 +39,12 @@ def answer(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Авторизация', reply_markup=keyboard)
     elif call.data == 'lk':
         markup = types.InlineKeyboardMarkup(row_width=2)
-        item_mail = types.InlineKeyboardButton(text='Почта', callback_data='mail')
+        f = open('users.json', 'r', encoding='utf-8')
+        users = json.loads(f.read())
+        if 'admin' in users['tg_id'][str(call.message.chat.id)]['roles']:
+            item_mail = types.InlineKeyboardButton(text='Почта депутата', callback_data='mail')
+        else:
+            item_mail = types.InlineKeyboardButton(text='Почта', callback_data='mail')
         item_mes = types.InlineKeyboardButton(text='Сайт', url='http://rezh.ml/')
         item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq')
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
@@ -81,26 +83,44 @@ def answer(call):
     elif call.data == 'mail':
         f = open('users.json', 'r', encoding='utf-8')
         user = json.loads(f.read())
-        keyboard = types.InlineKeyboardMarkup()
+        keyboard = types.InlineKeyboardMarkup(row_width=2)
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='lk')
         keyboard.add(item_back)
-        mail = requests.get('http://51.250.111.89:8080/api/appeals/user?answered=&find&type&district&topic&page&count',
-                            headers={'Authorization': f'Rezh {user["tg_id"][str(call.message.chat.id)]["access_token"]}'})
-        text = ''
-        for question in mail.json():
-            text += f"Вопрос: *{question['text']}*" + '\n'
-            text += f"Тип: {question['type']}" + '\n'
-            appeal_date = datetime.datetime.strptime(question['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
-            text += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n' * 2
-            if question['response']:
-                text += f"_Ответ: {question['response']}_" + '\n'
-                text += f"_От кого: {question['responsibleName']}_" + '\n'
-                response_date = datetime.datetime.strptime(question['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
-                text += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
-            else:
-                text += f"_Ответа на ваше сообщение еще нет(_" + '\n' * 3
-        bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
-                              text=text, reply_markup=keyboard, parse_mode='Markdown') # здесь можно будет посмотреть сообщения
+
+        if "admin" not in user["tg_id"][str(call.message.chat.id)]["roles"]:
+            mail = requests.get('http://51.250.111.89:8080/api/appeals/user?answered=&find&type&district&topic&page&count',
+                                headers={'Authorization': f'Rezh {user["tg_id"][str(call.message.chat.id)]["access_token"]}'})
+            text = ''
+            for question in mail.json():
+                text += f"Вопрос: *{question['text']}*" + '\n'
+                text += f"Тип: {question['type']}" + '\n'
+                appeal_date = datetime.datetime.strptime(question['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
+                text += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n' * 2
+                if question['response']:
+                    text += f"_Ответ: {question['response']}_" + '\n'
+                    text += f"_От кого: {question['responsibleName']}_" + '\n'
+                    response_date = datetime.datetime.strptime(question['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
+                    text += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
+                else:
+                    text += f"_Ответа на ваше сообщение еще нет(_" + '\n' * 3
+            bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
+                                  text=text, reply_markup=keyboard, parse_mode='Markdown')
+        else:
+            mail = requests.get('http://51.250.111.89:8080/api/appeals/admin',
+                                headers={'Authorization': f'Rezh {user["tg_id"][str(call.message.chat.id)]["access_token"]}'})
+            text = 'Сообщения, на которые еще никто не ответил' + '\n' * 2
+            for question in mail.json():
+                if not question['response']:
+                    text += f"Вопрос: *{question['text']}*" + '\n'
+                    text += f"Тип: {question['type']}" + '\n'
+                    text += f"От кого: {question['requester']['lastName']} {question['requester']['firstName']}" + '\n'
+                    appeal_date = datetime.datetime.strptime(question['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
+                    text += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n' * 3
+            text += "*Чтобы оставить ответ на сообщение, перейдите на сайт*"
+            item_site = types.InlineKeyboardButton(text='переход на сайт в личный кабинет', url='http://rezh.ml/login')
+            keyboard.add(item_site)
+            bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
+                                  text=text, reply_markup=keyboard, parse_mode='Markdown')
     elif call.data == 'logout':
         k = types.InlineKeyboardMarkup(row_width=2)
         b = types.InlineKeyboardButton(text='Подтверждаю', callback_data='logout_del')
@@ -113,10 +133,8 @@ def answer(call):
         kb = types.InlineKeyboardMarkup()
         g = open('users.json', 'r', encoding='utf-8')
         users = json.loads(g.read())
-        print(users)
         user = users['tg_id'].pop(str(call.message.chat.id))
         users['email'].pop(users['email'].index(user['email']))
-        print(users)
         d = open('users.json', 'w')
         json.dump(users, d)
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
@@ -145,9 +163,9 @@ def user_password(message, login):
                 'firstName': user[1]['firstName'],
                 'lastName': user[1]['lastName'],
                 'email': user[1]['email'],
+                'roles': user[1]['roles'],
                 'access_token': user[0]['access_token'],
             }
-            print(data)
             with open('users.json', 'w') as users:
                 json.dump(data, users)
             bot.send_message(message.chat.id, f"Успешный вход в систему, добро пожаловать, {user[1]['firstName']} {user[1]['lastName']}")
