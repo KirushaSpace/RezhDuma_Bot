@@ -36,12 +36,13 @@ def answer(call):
         item_reg = types.InlineKeyboardButton(text='Регистрация', url='http://rezh.ml/registration')
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
         keyboard.add(item_log, item_reg, item_back)
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Авторизация', reply_markup=keyboard)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Авторизация',
+                              reply_markup=keyboard)
     elif call.data == 'lk':
         markup = types.InlineKeyboardMarkup(row_width=2)
         f = open('users.json', 'r', encoding='utf-8')
         users = json.loads(f.read())
-        if 'admin' in users['tg_id'][str(call.message.chat.id)]['roles']:
+        if 'ADMIN' in users['tg_id'][str(call.message.chat.id)]['roles']:
             item_mail = types.InlineKeyboardButton(text='Почта депутата', callback_data='mail')
         else:
             item_mail = types.InlineKeyboardButton(text='Почта', callback_data='mail')
@@ -85,23 +86,26 @@ def answer(call):
         f = open('users.json', 'r', encoding='utf-8')
         user = json.loads(f.read())
         keyboard = types.InlineKeyboardMarkup(row_width=2)
-        if "admin" not in user["tg_id"][str(call.message.chat.id)]["roles"]:
+        if "ADMIN" not in user["tg_id"][str(call.message.chat.id)]["roles"]:
             mail = requests.get('http://51.250.111.89:8080/api/appeals/user?answered=&find&type&district&topic&page&count',
                                 headers={'Authorization': f'Rezh {user["tg_id"][str(call.message.chat.id)]["access_token"]}'})
             text = ''
-            item_appeal = types.InlineKeyboardButton(text='новое обращение', callback_data='new_appeal')
-            for question in mail.json():
-                text += f"Вопрос: *{question['text']}*" + '\n'
-                text += f"Тип: {question['type']}" + '\n'
-                appeal_date = datetime.datetime.strptime(question['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
-                text += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n' * 2
-                if question['response']:
-                    text += f"_Ответ: {question['response']}_" + '\n'
-                    text += f"_От кого: {question['responsibleName']}_" + '\n'
-                    response_date = datetime.datetime.strptime(question['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
-                    text += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
-                else:
-                    text += f"_Ответа на ваше сообщение еще нет(_" + '\n' * 3
+            item_appeal = types.InlineKeyboardButton(text='Новое обращение', callback_data='new_appeal')
+            if mail.text != '[]':
+                for question in mail.json():
+                    text += f"Вопрос: *{question['text']}*" + '\n'
+                    text += f"Тип: {question['type']}" + '\n'
+                    appeal_date = datetime.datetime.strptime(question['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
+                    text += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n' * 2
+                    if question['response']:
+                        text += f"_Ответ: {question['response']}_" + '\n'
+                        text += f"_От кого: {question['responsibleName']}_" + '\n'
+                        response_date = datetime.datetime.strptime(question['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
+                        text += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
+                    else:
+                        text += f"_Ответа на ваше сообщение еще нет(_" + '\n' * 3
+            else:
+                text += 'Вы еще не отправили ни одного сообщения'
             keyboard.add(item_appeal)
         else:
             mail = requests.get('http://51.250.111.89:8080/api/appeals/admin',
@@ -155,6 +159,13 @@ def answer(call):
         msg = bot.send_message(chat_id=call.message.chat.id, text='На какой вопрос вы хотите ответить?', reply_markup=k)
         bot.register_next_step_handler(msg, answer_appeal)
         f.close()
+    elif call.data == 'new_appeal':
+        k = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=3)
+        k.row('Центр', 'Стройгородок', 'Машиностроителей')
+        k.row('Гавань', "Вокзальный", "6-й участок")
+        k.add('Все')
+        msg = bot.send_message(chat_id=call.message.chat.id, text='Выберете район', reply_markup=k)
+        bot.register_next_step_handler(msg, post_appeal_get_district)
 
 
 def user_login(message):
@@ -223,6 +234,63 @@ def patch_answer_appeal(message, id):
     requests.patch(url=f'http://51.250.111.89:8080/api/appeals/admin/{id}',
                    files=form, headers={'Authorization': f'Rezh {users["tg_id"][str(message.chat.id)]["access_token"]}'})
     bot.send_message(chat_id=message.chat.id, text='Ответ успешно отправлен', reply_markup=k)
+
+
+def post_appeal_get_district(message):
+    form = {'district': (None, message.text)}
+    k = types.ReplyKeyboardMarkup(True, True, row_width=2)
+    k.row('Обращение', "Предложение")
+    k.row("Заявление", "Жалоба")
+    msg = bot.send_message(chat_id=message.chat.id, text='Выберите тип сообщения:', reply_markup=k)
+    bot.register_next_step_handler(msg, post_appeal_get_type, form)
+
+
+def post_appeal_get_type(message, form):
+    form['type'] = (None, message.text)
+    k = types.ReplyKeyboardMarkup(True, True, row_width=2)
+    k.row('Экономика и бюджет', "Социальные вопросы")
+    k.row('Сельское хозяйство', "Местное самоуправление")
+    k.row('Промышленность', "Строительство")
+    k.row('Транспорт', "Связь")
+    msg = bot.send_message(chat_id=message.chat.id, text='Выберите сферу деятельности', reply_markup=k)
+    bot.register_next_step_handler(msg, post_appeal_get_topic, form)
+
+
+def post_appeal_get_topic(message, form):
+    form['topic'] = (None, message.text)
+    k = types.ReplyKeyboardRemove()
+    msg = bot.send_message(chat_id=message.chat.id, text='Напишите ваше сообщение:', reply_markup=k)
+    bot.register_next_step_handler(msg, post_appeal_get_text, form)
+
+
+def post_appeal_get_text(message, form):
+    form['text'] = (None, message.text)
+    text = ''
+    text += f"Вопрос: _{form['text'][1]}_" + "\n" * 2
+    text += f"Тип: _{form['type'][1]}_" + "\n" * 2
+    text += f"Район: _{form['district'][1]}_" + "\n" * 2
+    text += f"Сфера деятельности: _{form['topic'][1]}_"
+    k = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True, one_time_keyboard=True)
+    k.row('Написать еще раз', 'Отправить')
+    msg = bot.send_message(chat_id=message.chat.id, text=text, reply_markup=k, parse_mode='Markdown')
+    bot.register_next_step_handler(msg, post_appeal, form)
+
+
+def post_appeal(message, form):
+    k = types.InlineKeyboardMarkup()
+    if message.text == 'Написать еще раз':
+        item = types.InlineKeyboardButton(text='Отправить сообщение заново', callback_data='new_appeal')
+        k.add(item)
+        bot.send_message(text='Антека не была отправлена', chat_id=message.chat.id, reply_markup=k)
+    elif message.text == 'Отправить':
+        f = open('users.json', 'r', encoding='utf-8')
+        users = json.loads(f.read())
+        item = types.InlineKeyboardButton(text='Вернуться', callback_data='mail')
+        k.add(item)
+        requests.post(url='http://51.250.111.89:8080/api/appeals/user',
+                      headers={'Authorization': f'Rezh {users["tg_id"][str(message.chat.id)]["access_token"]}'},
+                      files=form)
+        bot.send_message(text='Анкета была отправлена', chat_id=message.chat.id, reply_markup=k)
 
 
 @bot.message_handler(commands=['help'])
