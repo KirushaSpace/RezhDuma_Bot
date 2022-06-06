@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a45e9110-20af-4326-b31f-447b05a55554" name="Changes" comment="реализована почта">
+    <list default="true" id="a45e9110-20af-4326-b31f-447b05a55554" name="Changes" comment="добавлен личный кабинет депутата">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lk.py" beforeDir="false" afterPath="$PROJECT_DIR$/lk.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users.json" beforeDir="false" afterPath="$PROJECT_DIR$/users.json" afterDir="false" />
@@ -169,7 +169,7 @@
       <workItem from="1654420447911" duration="13372000" />
       <workItem from="1654446329881" duration="4122000" />
       <workItem from="1654458151866" duration="3121000" />
-      <workItem from="1654506598814" duration="4612000" />
+      <workItem from="1654506598814" duration="11067000" />
     </task>
     <task id="LOCAL-00001" summary="add help">
       <created>1649172737619</created>
@@ -248,7 +248,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654460266609</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="добавлен личный кабинет депутата">
+      <created>1654511337949</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1654511337949</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -277,10 +284,11 @@
     <MESSAGE value="добавлена авторизация" />
     <MESSAGE value="сделана полная авторизация и выход с аккаунта" />
     <MESSAGE value="реализована почта" />
-    <option name="LAST_COMMIT_MESSAGE" value="реализована почта" />
+    <MESSAGE value="добавлен личный кабинет депутата" />
+    <option name="LAST_COMMIT_MESSAGE" value="добавлен личный кабинет депутата" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/bot$lk__1_.coverage" NAME="lk (1) Coverage Results" MODIFIED="1654510909038" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bot$lk__1_.coverage" NAME="lk (1) Coverage Results" MODIFIED="1654516905948" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/bot$requestss.coverage" NAME="requestss Coverage Results" MODIFIED="1654105489435" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/bot$main.coverage" NAME="main Coverage Results" MODIFIED="1653852259856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/bot$appload_faq.coverage" NAME="appload_faq Coverage Results" MODIFIED="1654180052739" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

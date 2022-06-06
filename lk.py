@@ -73,6 +73,7 @@ def answer(call):
             response_date = datetime.datetime.strptime(i['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
             s_faq += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
         bot.send_message(call.message.chat.id, s_faq, parse_mode='Markdown', reply_markup=keyboard)
+        response.close()
     elif call.data == 'back':
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         start(call.message)
@@ -84,13 +85,11 @@ def answer(call):
         f = open('users.json', 'r', encoding='utf-8')
         user = json.loads(f.read())
         keyboard = types.InlineKeyboardMarkup(row_width=2)
-        item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='lk')
-        keyboard.add(item_back)
-
         if "admin" not in user["tg_id"][str(call.message.chat.id)]["roles"]:
             mail = requests.get('http://51.250.111.89:8080/api/appeals/user?answered=&find&type&district&topic&page&count',
                                 headers={'Authorization': f'Rezh {user["tg_id"][str(call.message.chat.id)]["access_token"]}'})
             text = ''
+            item_appeal = types.InlineKeyboardButton(text='новое обращение', callback_data='new_appeal')
             for question in mail.json():
                 text += f"Вопрос: *{question['text']}*" + '\n'
                 text += f"Тип: {question['type']}" + '\n'
@@ -103,30 +102,32 @@ def answer(call):
                     text += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
                 else:
                     text += f"_Ответа на ваше сообщение еще нет(_" + '\n' * 3
-            bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
-                                  text=text, reply_markup=keyboard, parse_mode='Markdown')
+            keyboard.add(item_appeal)
         else:
             mail = requests.get('http://51.250.111.89:8080/api/appeals/admin',
                                 headers={'Authorization': f'Rezh {user["tg_id"][str(call.message.chat.id)]["access_token"]}'})
             text = 'Сообщения, на которые еще никто не ответил' + '\n' * 2
+            item_answer = types.InlineKeyboardButton(text='ответить на сообщение', callback_data='ans_appeal')
             for question in mail.json():
                 if not question['response']:
-                    text += f"Вопрос: *{question['text']}*" + '\n'
+                    text += f"Вопрос _{question['id']}_: *{question['text']}*" + '\n'
                     text += f"Тип: {question['type']}" + '\n'
                     text += f"От кого: {question['requester']['lastName']} {question['requester']['firstName']}" + '\n'
                     appeal_date = datetime.datetime.strptime(question['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
                     text += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n' * 3
-            text += "*Чтобы оставить ответ на сообщение, перейдите на сайт*"
-            item_site = types.InlineKeyboardButton(text='переход на сайт в личный кабинет', url='http://rezh.ml/login')
-            keyboard.add(item_site)
-            bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
-                                  text=text, reply_markup=keyboard, parse_mode='Markdown')
+            keyboard.add(item_answer)
+        item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='lk')
+        keyboard.add(item_back)
+        bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id, text=text,
+                              reply_markup=keyboard, parse_mode='Markdown')
+        f.close()
     elif call.data == 'logout':
         k = types.InlineKeyboardMarkup(row_width=2)
         b = types.InlineKeyboardButton(text='Подтверждаю', callback_data='logout_del')
         b1 = types.InlineKeyboardButton(text='Случайно нажал', callback_data='lk')
         k.add(b, b1)
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Хотите выйти?', reply_markup=k)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Хотите выйти?',
+                              reply_markup=k)
     elif call.data == 'del':
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
     elif call.data == 'logout_del':
@@ -139,7 +140,21 @@ def answer(call):
         json.dump(users, d)
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
         kb.add(item_back)
+        g.close()
+        d.close()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Вы успешно вышли', reply_markup=kb)
+    elif call.data == 'ans_appeal':
+        k = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
+        f = open('users.json', 'r', encoding='utf-8')
+        user = json.loads(f.read())
+        mail = requests.get('http://51.250.111.89:8080/api/appeals/admin',
+                            headers={'Authorization': f'Rezh {user["tg_id"][str(call.message.chat.id)]["access_token"]}'})
+        arr_id = [i['id'] for i in mail.json() if not i['response']]
+        items = [types.KeyboardButton(text=i) for i in arr_id]
+        k.add(*items)
+        msg = bot.send_message(chat_id=call.message.chat.id, text='На какой вопрос вы хотите ответить?', reply_markup=k)
+        bot.register_next_step_handler(msg, answer_appeal)
+        f.close()
 
 
 def user_login(message):
@@ -160,6 +175,7 @@ def user_password(message, login):
         if user[1]['email'] not in data['email']:
             data['email'].append(user[1]['email'])
             data['tg_id'][message.chat.id] = {
+                'id': user[1]['id'],
                 'firstName': user[1]['firstName'],
                 'lastName': user[1]['lastName'],
                 'email': user[1]['email'],
@@ -180,7 +196,7 @@ def user_password(message, login):
             kb.add(item)
             bot.edit_message_text(chat_id=message.chat.id,
                                   message_id=message.message_id,
-                                  text='Ваш аккаунт авторизирован на другом телеграмм аккаунте, пожалуйста выйдите, чтобы авторизироваться тут',
+                                  text='Ваш аккаунт авторизирован в другом телеграмм аккаунте, пожалуйста выйдите, чтобы авторизироваться тут',
                                   reply_markup=kb)
         g.close()
     else:
@@ -188,6 +204,25 @@ def user_password(message, login):
         item = types.InlineKeyboardButton(text='Вернуться', callback_data='Yes')
         keyboard.add(item)
         bot.send_message(chat_id=message.chat.id, text='Неправльный ввод данных, попробуйте еще раз', reply_markup=keyboard)
+
+
+def answer_appeal(message):
+    id = message.text
+    k = types.ReplyKeyboardRemove()
+    msg = bot.send_message(chat_id=message.chat.id, text='Напишите ваш ответ на сообщение:', reply_markup=k)
+    bot.register_next_step_handler(msg, patch_answer_appeal, id)
+
+
+def patch_answer_appeal(message, id):
+    k = types.InlineKeyboardMarkup()
+    item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='lk')
+    k.add(item_back)
+    f = open('users.json', 'r', encoding='utf-8')
+    users = json.loads(f.read())
+    form = {'id': (None, users['tg_id'][str(message.chat.id)]['id']), 'response': (None, message.text), 'frequent': (None, False)}
+    requests.patch(url=f'http://51.250.111.89:8080/api/appeals/admin/{id}',
+                   files=form, headers={'Authorization': f'Rezh {users["tg_id"][str(message.chat.id)]["access_token"]}'})
+    bot.send_message(chat_id=message.chat.id, text='Ответ успешно отправлен', reply_markup=k)
 
 
 @bot.message_handler(commands=['help'])
