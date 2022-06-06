@@ -233,6 +233,9 @@ def patch_answer_appeal(message, id):
     form = {'id': (None, users['tg_id'][str(message.chat.id)]['id']), 'response': (None, message.text), 'frequent': (None, False)}
     requests.patch(url=f'http://51.250.111.89:8080/api/appeals/admin/{id}',
                    files=form, headers={'Authorization': f'Rezh {users["tg_id"][str(message.chat.id)]["access_token"]}'})
+    user = requests.get(url=f'http://51.250.111.89:8080/api/appeals/admin/{id}',
+                        headers={'Authorization': f'Rezh {users["tg_id"][str(message.chat.id)]["access_token"]}'})
+    ping_user(user.json())
     bot.send_message(chat_id=message.chat.id, text='Ответ успешно отправлен', reply_markup=k)
 
 
@@ -267,8 +270,8 @@ def post_appeal_get_text(message, form):
     form['text'] = (None, message.text)
     text = ''
     text += f"Вопрос: _{form['text'][1]}_" + "\n" * 2
-    text += f"Тип: _{form['type'][1]}_" + "\n" * 2
-    text += f"Район: _{form['district'][1]}_" + "\n" * 2
+    text += f"Тип: _{form['type'][1]}_" + "\n"
+    text += f"Район: _{form['district'][1]}_" + "\n"
     text += f"Сфера деятельности: _{form['topic'][1]}_"
     k = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True, one_time_keyboard=True)
     k.row('Написать еще раз', 'Отправить')
@@ -291,6 +294,21 @@ def post_appeal(message, form):
                       headers={'Authorization': f'Rezh {users["tg_id"][str(message.chat.id)]["access_token"]}'},
                       files=form)
         bot.send_message(text='Анкета была отправлена', chat_id=message.chat.id, reply_markup=k)
+
+
+def ping_user(json_file):
+    id = json_file['requester']['id']
+    f = open('users.json', 'r', encoding='utf-8')
+    users = json.loads(f.read())
+    f.close()
+    for i in users['tg_id'].keys():
+        if users['tg_id'][i]['id'] == id:
+            k = types.InlineKeyboardMarkup()
+            item = types.InlineKeyboardButton('Перейти в сообщения', callback_data='mail')
+            k.add(item)
+            t = f'На ваш вопрос: _{json_file["text"]}_' + '\n' * 2
+            t += 'Пришел ответ'
+            bot.send_message(chat_id=i, text=t, reply_markup=k, parse_mode='Markdown')
 
 
 @bot.message_handler(commands=['help'])
