@@ -138,11 +138,11 @@ def answer(call):
         f.close()
     elif call.data == 'logout':
         k = types.InlineKeyboardMarkup(row_width=2)
-        b = types.InlineKeyboardButton(text='Подтверждаю', callback_data='logout_del')
-        b1 = types.InlineKeyboardButton(text='<< Случайно нажал', callback_data='lk')
+        b = types.InlineKeyboardButton(text='Выйти', callback_data='logout_del')
+        b1 = types.InlineKeyboardButton(text='<< Вернуться', callback_data='lk')
         k.add(b, b1)
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Хотите выйти?',
-                              reply_markup=k)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              text='Подтверждение выхода из личного кабинета', reply_markup=k)
     elif call.data == 'del':
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
     elif call.data == 'logout_del':
@@ -330,18 +330,6 @@ def ping_user(json_file):
             t = f'На ваш вопрос: _{json_file["text"]}_' + '\n' * 2
             t += 'Пришел ответ'
             bot.send_message(chat_id=i, text=t, reply_markup=k, parse_mode='Markdown')
-
-
-@bot.message_handler(commands=['help'])
-def help(message):
-    cmds = open('help.txt', 'r', encoding="utf-8")
-    bot.send_message(message.chat.id, cmds.read())
-    cmds.close()
-
-
-@bot.message_handler(commands=['info'])
-def information(message):
-    bot.send_message(message.chat.id, message)
 
 
 @bot.message_handler(content_types=["text"])
