@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a45e9110-20af-4326-b31f-447b05a55554" name="Changes" comment="можно написать новое обращение, можно ответить на отправленные">
+    <list default="true" id="a45e9110-20af-4326-b31f-447b05a55554" name="Changes" comment="добавлены уведомления!!!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/faq.json" beforeDir="false" afterPath="$PROJECT_DIR$/faq.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lk.py" beforeDir="false" afterPath="$PROJECT_DIR$/lk.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users.json" beforeDir="false" afterPath="$PROJECT_DIR$/users.json" afterDir="false" />
     </list>
@@ -169,7 +170,11 @@
       <workItem from="1654420447911" duration="13372000" />
       <workItem from="1654446329881" duration="4122000" />
       <workItem from="1654458151866" duration="3121000" />
-      <workItem from="1654506598814" duration="23355000" />
+      <workItem from="1654506598814" duration="23939000" />
+      <workItem from="1654533761090" duration="12000" />
+      <workItem from="1654619621578" duration="1315000" />
+      <workItem from="1654620987031" duration="1788000" />
+      <workItem from="1655191753828" duration="3990000" />
     </task>
     <task id="LOCAL-00001" summary="add help">
       <created>1649172737619</created>
@@ -269,7 +274,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654525257221</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="добавлены уведомления!!!">
+      <created>1654533332923</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1654533332923</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -301,12 +313,30 @@
     <MESSAGE value="добавлен личный кабинет депутата" />
     <MESSAGE value="возможность писать ответы депутатам" />
     <MESSAGE value="можно написать новое обращение, можно ответить на отправленные" />
-    <option name="LAST_COMMIT_MESSAGE" value="можно написать новое обращение, можно ответить на отправленные" />
+    <MESSAGE value="добавлены уведомления!!!" />
+    <option name="LAST_COMMIT_MESSAGE" value="добавлены уведомления!!!" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/lk.py</url>
+          <line>92</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/lk.py</url>
+          <line>91</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/bot$lk__1_.coverage" NAME="lk (1) Coverage Results" MODIFIED="1654532883877" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bot$lk__1_.coverage" NAME="lk (1) Coverage Results" MODIFIED="1655195992380" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/bot$requestss.coverage" NAME="requestss Coverage Results" MODIFIED="1654105489435" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bot$lk.coverage" NAME="lk Coverage Results" MODIFIED="1655194794752" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/bot$main.coverage" NAME="main Coverage Results" MODIFIED="1653852259856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/bot$appload_faq.coverage" NAME="appload_faq Coverage Results" MODIFIED="1654180052739" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bot$appload_faq.coverage" NAME="appload_faq Coverage Results" MODIFIED="1655192178274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

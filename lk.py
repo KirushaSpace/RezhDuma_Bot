@@ -7,7 +7,6 @@ import json
 
 bot = telebot.TeleBot(TOKEN)
 
-
 @bot.message_handler(commands=['start'])
 def start(message):
     f = open('start_message.txt', 'r', encoding='utf-8')
@@ -20,9 +19,9 @@ def start(message):
     else:
         item_lk = types.InlineKeyboardButton(text='Личный кабинет', callback_data='lk')
         markup.add(item_lk)
-    item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq')
+    item_fq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq__0:5')
     item_site = types.InlineKeyboardButton(text='Переход на сайт', url='http://rezh.ml/')
-    markup.add(item_site, item_faq)
+    markup.add(item_site, item_fq)
     bot.send_message(message.chat.id, f.read(), reply_markup=markup)
     f.close()
     g.close()
@@ -47,7 +46,7 @@ def answer(call):
         else:
             item_mail = types.InlineKeyboardButton(text='Почта', callback_data='mail')
         item_mes = types.InlineKeyboardButton(text='Сайт', url='http://rezh.ml/')
-        item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq')
+        item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq__0:5')
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
         item_logout = types.InlineKeyboardButton(text='Выйти из личного кабинета', callback_data='logout')
         markup.add(item_mail, item_mes, item_faq, item_back, item_logout)
@@ -55,25 +54,40 @@ def answer(call):
         bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
                               text=f.read(), reply_markup=markup)
         f.close()
-    elif call.data == 'faq':
+    elif call.data.startswith('faqa'):
         s_faq = ''
+        split_call = call.data.split('__')
+        print(split_call)
+        page = list(map(int, split_call[1].split(':')))
+        response = requests.get('http://51.250.111.89:8080/api/appeals/popular')
+        faq = open('faq.json', 'w')
+        json.dump(response.json(), faq)
+        faq.close()
         keyboard = types.InlineKeyboardMarkup(row_width=2)
-        item_next = types.InlineKeyboardButton(text='Дальше', callback_data='next_page')
-        item_back = types.InlineKeyboardButton(text='Назад', callback_data='back_page')
-        item_remove = types.InlineKeyboardButton(text='Вернуться', callback_data='del')
-        keyboard.add(item_back, item_next, item_remove)
         response = open('faq.json', 'r', encoding='utf-8')
         f = json.loads(response.read())
-        for i in f:
-            s_faq += f"Вопрос: *{i['text']}*" + '\n'
-            s_faq += f"Тип: {i['type']}" + '\n'
-            appeal_date = datetime.datetime.strptime(i['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
+        response.close()
+        if page[0] != 0:
+            item_back = types.InlineKeyboardButton(text='Назад', callback_data=f'faq__{page[0]-5}:{page[1]-5}')
+            keyboard.add(item_back)
+        if page[1] < len(f):
+            item_next = types.InlineKeyboardButton(text='Дальше', callback_data=f'faq__{page[0]+5}:{page[1]+5}')
+            keyboard.add(item_next)
+        else:
+            page[1] = len(f)
+        item_remove = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
+        keyboard.add(item_remove)
+        for i in range(page[0], page[1]):
+            s_faq += f"Вопрос: *{f[i]['text']}*" + '\n'
+            s_faq += f"Тип: {f[i]['type']}" + '\n'
+            appeal_date = datetime.datetime.strptime(f[i]['appealDate'], "%Y-%m-%dT%H:%M:%S.%f")
             s_faq += f"Дата: {appeal_date.strftime('%Y.%m.%d %H:%M:%S')}" + '\n'
-            s_faq += f"_Ответ: {i['response']}_" + '\n'
-            s_faq += f"_От кого: {i['responsibleName']}_" + '\n'
-            response_date = datetime.datetime.strptime(i['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
+            s_faq += f"_Ответ: {f[i]['response']}_" + '\n'
+            s_faq += f"_От кого: {f[i]['responsibleName']}_" + '\n'
+            response_date = datetime.datetime.strptime(f[i]['responseDate'], "%Y-%m-%dT%H:%M:%S.%f")
             s_faq += f"_Дата: {response_date.strftime('%Y.%m.%d %H:%M:%S')}_" + '\n' * 3
-        bot.send_message(call.message.chat.id, s_faq, parse_mode='Markdown', reply_markup=keyboard)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=s_faq,
+                              parse_mode='Markdown', reply_markup=keyboard)
         response.close()
     elif call.data == 'back':
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
@@ -168,6 +182,11 @@ def answer(call):
         bot.register_next_step_handler(msg, post_appeal_get_district)
 
 
+# @bot.callback_query_handler(func=lambda call: call.data.startswith('faq'))
+# def answer(call):
+#     split_call = call.data.split('__')
+#     print(split_call)
+
 def user_login(message):
     login = message.text
     msg = bot.send_message(message.chat.id, 'Введите пароль:')
@@ -203,10 +222,9 @@ def user_password(message, login):
             users.close()
         else:
             kb = types.InlineKeyboardMarkup()
-            item = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
+            item = types.InlineKeyboardButton(text='Вернуться', callback_data='Yes')
             kb.add(item)
-            bot.edit_message_text(chat_id=message.chat.id,
-                                  message_id=message.message_id,
+            bot.send_message(chat_id=message.chat.id,
                                   text='Ваш аккаунт авторизирован в другом телеграмм аккаунте, пожалуйста выйдите, чтобы авторизироваться тут',
                                   reply_markup=kb)
         g.close()
