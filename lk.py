@@ -1,11 +1,13 @@
 import telebot
 from config import TOKEN
 from telebot import types
+from list_msg import arr
 import requests
 import datetime
 import json
 
 bot = telebot.TeleBot(TOKEN)
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -19,7 +21,7 @@ def start(message):
     else:
         item_lk = types.InlineKeyboardButton(text='Личный кабинет', callback_data='lk')
         markup.add(item_lk)
-    item_fq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq__0:5')
+    item_fq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq__0:3')
     item_site = types.InlineKeyboardButton(text='Переход на сайт', url='http://rezh.ml/')
     markup.add(item_site, item_fq)
     bot.send_message(message.chat.id, f.read(), reply_markup=markup)
@@ -44,9 +46,9 @@ def answer(call):
         if 'ADMIN' in users['tg_id'][str(call.message.chat.id)]['roles']:
             item_mail = types.InlineKeyboardButton(text='Почта депутата', callback_data='mail')
         else:
-            item_mail = types.InlineKeyboardButton(text='Почта', callback_data='mail')
+            item_mail = types.InlineKeyboardButton(text='Почта', callback_data='mail__0:4')
         item_mes = types.InlineKeyboardButton(text='Сайт', url='http://rezh.ml/')
-        item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq__0:5')
+        item_faq = types.InlineKeyboardButton(text='Часто задаваемые вопросы', callback_data='faq__0:3')
         item_back = types.InlineKeyboardButton(text='Вернуться', callback_data='back')
         item_logout = types.InlineKeyboardButton(text='Выйти из личного кабинета', callback_data='logout')
         markup.add(item_mail, item_mes, item_faq, item_back, item_logout)
@@ -54,24 +56,19 @@ def answer(call):
         bot.edit_message_text(message_id=call.message.message_id, chat_id=call.message.chat.id,
                               text=f.read(), reply_markup=markup)
         f.close()
-    elif call.data.startswith('faqa'):
+    elif call.data.startswith('faq'):
         s_faq = ''
         split_call = call.data.split('__')
-        print(split_call)
         page = list(map(int, split_call[1].split(':')))
-        response = requests.get('http://51.250.111.89:8080/api/appeals/popular')
-        faq = open('faq.json', 'w')
-        json.dump(response.json(), faq)
-        faq.close()
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         response = open('faq.json', 'r', encoding='utf-8')
         f = json.loads(response.read())
         response.close()
         if page[0] != 0:
-            item_back = types.InlineKeyboardButton(text='Назад', callback_data=f'faq__{page[0]-5}:{page[1]-5}')
+            item_back = types.InlineKeyboardButton(text='Назад', callback_data=f'faq__{page[0]-3}:{page[1]-3}')
             keyboard.add(item_back)
         if page[1] < len(f):
-            item_next = types.InlineKeyboardButton(text='Дальше', callback_data=f'faq__{page[0]+5}:{page[1]+5}')
+            item_next = types.InlineKeyboardButton(text='Дальше', callback_data=f'faq__{page[0]+3}:{page[1]+3}')
             keyboard.add(item_next)
         else:
             page[1] = len(f)
@@ -96,7 +93,7 @@ def answer(call):
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         msg = bot.send_message(chat_id=call.message.chat.id, text='Введите логин (почту) к личному кабинету')
         bot.register_next_step_handler(msg, user_login)
-    elif call.data == 'mail':
+    elif call.data.startswith('mail'):
         f = open('users.json', 'r', encoding='utf-8')
         user = json.loads(f.read())
         keyboard = types.InlineKeyboardMarkup(row_width=2)
@@ -160,7 +157,8 @@ def answer(call):
         kb.add(item_back)
         g.close()
         d.close()
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Вы успешно вышли', reply_markup=kb)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text='Вы успешно вышли',
+                              reply_markup=kb)
     elif call.data == 'ans_appeal':
         k = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
         f = open('users.json', 'r', encoding='utf-8')
@@ -174,18 +172,54 @@ def answer(call):
         bot.register_next_step_handler(msg, answer_appeal)
         f.close()
     elif call.data == 'new_appeal':
-        k = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=3)
-        k.row('Центр', 'Стройгородок', 'Машиностроителей')
-        k.row('Гавань', "Вокзальный", "6-й участок")
-        k.add('Все')
-        msg = bot.send_message(chat_id=call.message.chat.id, text='Выберете район', reply_markup=k)
-        bot.register_next_step_handler(msg, post_appeal_get_district)
+        k = types.InlineKeyboardMarkup(row_width=3)
+        k.row(types.InlineKeyboardButton(text='Центр', callback_data='district Цр'),
+              types.InlineKeyboardButton(text='Стройгородок', callback_data='district Ск'),
+              types.InlineKeyboardButton(text='Машиностроителей', callback_data='district Мй'))
+        k.row(types.InlineKeyboardButton(text='Гавань', callback_data='district Гь'),
+              types.InlineKeyboardButton(text='Вокзальный', callback_data='district Вй'),
+              types.InlineKeyboardButton(text='6-й участок', callback_data='district 6к'))
+        k.row(types.InlineKeyboardButton(text='Все', callback_data='district Все'))
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              text='Выберете район', reply_markup=k)
+    elif call.data.startswith('district'):
+        ans = call.data.split()
+        k = types.InlineKeyboardMarkup(row_width=2)
+        k.row(types.InlineKeyboardButton(text='Обращение', callback_data=f'type {ans[1]},Ое'),
+              types.InlineKeyboardButton(text='Предложение', callback_data=f'type {ans[1]},Пе'))
+        k.row(types.InlineKeyboardButton(text='Заявление', callback_data=f'type {ans[1]},Зе'),
+              types.InlineKeyboardButton(text='Жалоба', callback_data=f'type {ans[1]},Жа'))
+        k.row(types.InlineKeyboardButton(text='Все', callback_data=f'type {ans[1]},Все'))
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              text='Выберите тип сообщения', reply_markup=k)
+    elif call.data.startswith('type'):
+        ans = call.data.split()
+        k = types.InlineKeyboardMarkup(row_width=2)
+        k.row(types.InlineKeyboardButton(text='Экономика и бюджет', callback_data=f'topic {ans[1]},Эт'),
+              types.InlineKeyboardButton(text='Социальные вопросы', callback_data=f'topic {ans[1]},Сы'),
+              types.InlineKeyboardButton(text='Сельское хозяйство', callback_data=f'topic {ans[1]},Сео'))
+        k.row(types.InlineKeyboardButton(text='Местное самоуправление', callback_data=f'topic {ans[1]},Ме'),
+              types.InlineKeyboardButton(text='Промышленность', callback_data=f'topic {ans[1]},Пь'),
+              types.InlineKeyboardButton(text='Строительство', callback_data=f'topic {ans[1]},Сто'))
+        k.row(types.InlineKeyboardButton(text='Транспорт', callback_data=f'topic {ans[1]},Тт'),
+              types.InlineKeyboardButton(text='Связь', callback_data=f'topic {ans[1]},Сь'))
+        k.row(types.InlineKeyboardButton(text='Все', callback_data=f'topic {ans[1]},Все'))
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              text='Выберите сферу деятельности', reply_markup=k)
+    elif call.data.startswith('topic'):
+        ans = call.data.split()[1]
+        out = ans.split(',')
+        form = {'district': (None, arr[out[0]]), 'type': (None, arr[out[1]]), 'topic': (None, arr[out[2]])}
+        msg = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                    text='Введите сообщение')
+        bot.register_next_step_handler(msg, post_appeal_get_text, form)
 
 
 # @bot.callback_query_handler(func=lambda call: call.data.startswith('faq'))
 # def answer(call):
 #     split_call = call.data.split('__')
 #     print(split_call)
+
 
 def user_login(message):
     login = message.text
@@ -225,14 +259,15 @@ def user_password(message, login):
             item = types.InlineKeyboardButton(text='Вернуться', callback_data='Yes')
             kb.add(item)
             bot.send_message(chat_id=message.chat.id,
-                                  text='Ваш аккаунт авторизирован в другом телеграмм аккаунте, пожалуйста выйдите, чтобы авторизироваться тут',
-                                  reply_markup=kb)
+                             text='Ваш аккаунт авторизирован в другом телеграмм аккаунте, пожалуйста выйдите, чтобы авторизироваться тут',
+                             reply_markup=kb)
         g.close()
     else:
         keyboard = types.InlineKeyboardMarkup()
         item = types.InlineKeyboardButton(text='Вернуться', callback_data='Yes')
         keyboard.add(item)
-        bot.send_message(chat_id=message.chat.id, text='Неправльный ввод данных, попробуйте еще раз', reply_markup=keyboard)
+        bot.send_message(chat_id=message.chat.id, text='Неправльный ввод данных, попробуйте еще раз',
+                         reply_markup=keyboard)
 
 
 def answer_appeal(message):
@@ -257,33 +292,6 @@ def patch_answer_appeal(message, id):
     bot.send_message(chat_id=message.chat.id, text='Ответ успешно отправлен', reply_markup=k)
 
 
-def post_appeal_get_district(message):
-    form = {'district': (None, message.text)}
-    k = types.ReplyKeyboardMarkup(True, True, row_width=2)
-    k.row('Обращение', "Предложение")
-    k.row("Заявление", "Жалоба")
-    msg = bot.send_message(chat_id=message.chat.id, text='Выберите тип сообщения:', reply_markup=k)
-    bot.register_next_step_handler(msg, post_appeal_get_type, form)
-
-
-def post_appeal_get_type(message, form):
-    form['type'] = (None, message.text)
-    k = types.ReplyKeyboardMarkup(True, True, row_width=2)
-    k.row('Экономика и бюджет', "Социальные вопросы")
-    k.row('Сельское хозяйство', "Местное самоуправление")
-    k.row('Промышленность', "Строительство")
-    k.row('Транспорт', "Связь")
-    msg = bot.send_message(chat_id=message.chat.id, text='Выберите сферу деятельности', reply_markup=k)
-    bot.register_next_step_handler(msg, post_appeal_get_topic, form)
-
-
-def post_appeal_get_topic(message, form):
-    form['topic'] = (None, message.text)
-    k = types.ReplyKeyboardRemove()
-    msg = bot.send_message(chat_id=message.chat.id, text='Напишите ваше сообщение:', reply_markup=k)
-    bot.register_next_step_handler(msg, post_appeal_get_text, form)
-
-
 def post_appeal_get_text(message, form):
     form['text'] = (None, message.text)
     text = ''
@@ -306,7 +314,7 @@ def post_appeal(message, form):
     elif message.text == 'Отправить':
         f = open('users.json', 'r', encoding='utf-8')
         users = json.loads(f.read())
-        item = types.InlineKeyboardButton(text='Вернуться', callback_data='mail')
+        item = types.InlineKeyboardButton(text='Вернуться', callback_data=f'mail все,все,все')
         k.add(item)
         requests.post(url='http://51.250.111.89:8080/api/appeals/user',
                       headers={'Authorization': f'Rezh {users["tg_id"][str(message.chat.id)]["access_token"]}'},
@@ -346,4 +354,6 @@ def any_msg(message):
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 
+bot.enable_save_next_step_handlers(delay=2)
+bot.load_next_step_handlers()
 bot.polling(none_stop=True)
